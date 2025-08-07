@@ -1,0 +1,1 @@
+# Bidder approval model logic
