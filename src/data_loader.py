@@ -6,6 +6,7 @@ from google.oauth2.service_account import Credentials
 
 
 def load_google_sheet(sheet_id: str, worksheet_name: str = None) -> pandas.DataFrame:
+
     """
     Loads data from a specified Google Sheet into a pandas DataFrame.
 
@@ -31,22 +32,23 @@ def load_google_sheet(sheet_id: str, worksheet_name: str = None) -> pandas.DataF
         google.auth.exceptions.GoogleAuthError: If authentication with the service
             account fails.
     """
-
-    credentials_path = Path(__file__).resolve(
-    ).parents[1] / "auth" / "case-antiques-ml-projects-sheets-reader-credentials.json"
+    
+    # Specify the google credentials path and scope
+    credentials_path = Path(__file__).resolve().parents[1] / "auth" / "case-antiques-ml-projects-sheets-reader-credentials.json"
 
     SCOPES = [
         "https://www.googleapis.com/auth/spreadsheets.readonly",
         "https://www.googleapis.com/auth/drive.readonly"
     ]
 
-    creds = Credentials.from_service_account_file(
-        credentials_path, scopes=SCOPES)
-
+    creds = Credentials.from_service_account_file(credentials_path, scopes=SCOPES)
+    
+    # Access the worksheet
     google_creds = gspread.authorize(creds)
     sheet = google_creds.open_by_key(sheet_id)
-    worksheet = sheet.sheet1 if worksheet_name is None else sheet.worksheet(
-        worksheet_name)
+    worksheet = sheet.sheet1 if worksheet_name is None else sheet.worksheet(worksheet_name)
+    
+    # Construct the data frame
     data = worksheet.get_all_records()
     df = pandas.DataFrame(data)
 
